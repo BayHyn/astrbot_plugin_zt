@@ -1,10 +1,8 @@
 
-
 import time
 import psutil
 from astrbot.api.event import filter
 from astrbot.api.star import Context, Star, register
-from astrbot.core.config.astrbot_config import AstrBotConfig
 from astrbot.core.platform.astr_message_event import AstrMessageEvent
 
 @register(
@@ -15,9 +13,8 @@ from astrbot.core.platform.astr_message_event import AstrMessageEvent
     "https://github.com/Zhalslar/astrbot_plugin_zt",
 )
 class PokeproPlugin(Star):
-    def __init__(self, context: Context, config: AstrBotConfig):
+    def __init__(self, context: Context):
         super().__init__(context)
-        self.config = config
 
     @filter.command("zt")
     async def get_zt(self, event: AstrMessageEvent):
@@ -45,7 +42,7 @@ class PokeproPlugin(Star):
             f"磁盘占用: {disk_usage_str}\n"
             f"网络发送: {self._convert_to_readable(net_info.bytes_sent)}\n"
             f"网络接收: {self._convert_to_readable(net_info.bytes_recv)}\n"
-            f"进程数量:   {process_count}\n"
+            f"进程数量: {process_count}\n"
             f"连接数量: {net_connections}"
         )
         yield event.plain_result(sys_info)
@@ -63,8 +60,7 @@ class PokeproPlugin(Star):
         memory_info = psutil.virtual_memory()
         used_memory_gb = memory_info.used / (1024**3)
         total_memory_gb = memory_info.total / (1024**3)
-        memory_percent = (used_memory_gb / total_memory_gb) * 100
-        return f"{used_memory_gb:.2f}G/{total_memory_gb:.1f}G ({memory_percent:.2f}%)"
+        return f"{used_memory_gb:.2f}G/{total_memory_gb:.1f}G"
 
 
     def _get_average_cpu_usage(self, samples=5, interval=0.5):
@@ -88,5 +84,4 @@ class PokeproPlugin(Star):
         disk_info = psutil.disk_usage(path)
         used_disk_gb = disk_info.used / (1024**3)
         total_disk_gb = disk_info.total / (1024**3)
-        disk_percent = (used_disk_gb / total_disk_gb) * 100
-        return f"{used_disk_gb:.2f}G/{total_disk_gb:.1f}G ({disk_percent:.2f}%)"
+        return f"{used_disk_gb:.2f}G/{total_disk_gb:.1f}G"
