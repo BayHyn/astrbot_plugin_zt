@@ -3,22 +3,26 @@ import time
 import psutil
 from astrbot.api.event import filter
 from astrbot.api.star import Context, Star, register
+from astrbot.core.config.astrbot_config import AstrBotConfig
 from astrbot.core.platform.astr_message_event import AstrMessageEvent
 
 @register(
     "astrbot_plugin_zt",
     "Zhalslar",
     "简易版服务器状态插件",
-    "1.0.0",
+    "1.0.1",
     "https://github.com/Zhalslar/astrbot_plugin_zt",
 )
 class PokeproPlugin(Star):
-    def __init__(self, context: Context):
+    def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
+        self.only_admin = config.get("only_admin", False)
 
     @filter.command("zt")
     async def get_zt(self, event: AstrMessageEvent):
         """获取并显示当前系统状态（精简版）"""
+        if self.only_admin and not event.is_admin():
+            return
         cpu_usage = psutil.cpu_percent(interval=1)
         memory_info = psutil.virtual_memory()
         sys_info = (f"CPU使用: {cpu_usage}%\n"
@@ -29,6 +33,8 @@ class PokeproPlugin(Star):
     @filter.command("状态")
     async def get_status(self, event: AstrMessageEvent):
         """获取并显示当前系统状态"""
+        if self.only_admin and not event.is_admin():
+            return
         cpu_usage_str = self._get_average_cpu_usage(samples=3, interval=0.2)
         memory_usage_str = await self._get_memory_usage()
         disk_usage_str = self._get_disk_usage("/")

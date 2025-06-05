@@ -1,0 +1,8 @@
+{
+    "only_admin": {
+        "description": "仅管理员可用本插件命令",
+        "type": "bool",
+        "hint": "",
+        "default": false
+    }
+}
